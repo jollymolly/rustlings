@@ -9,7 +9,7 @@
 
 // Put your function here!
 fn calculate_apple_price(apples: usize) -> usize {
-    let multiplier = if (apples > 40) {1} else {2};
+    let multiplier = if apples > 40 {1} else {2};
     apples * multiplier
 }
 
