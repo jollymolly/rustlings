@@ -11,8 +11,6 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
-
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
 // 2. Split the given string on the commas present in it
@@ -23,9 +21,48 @@ struct Person {
 // 6. If while extracting the name and the age something goes wrong, an error should be returned
 // If everything goes well, then return a Result of a Person object
 
+#[derive(Debug)]
+struct PersonFromError(String);
+
+impl std::fmt::Display for PersonFromError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PersonFromError: {}", self.0)
+    }
+}
+
+impl error::Error for PersonFromError {}
+
 impl FromStr for Person {
     type Err = Box<dyn error::Error>;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        if s.len() == 0 {
+            return Err(
+                Box::new(
+                    PersonFromError("input string is empty".to_owned())
+                )
+            );
+        }
+
+        let parts: Vec<_> = s.split(',').collect();
+
+        if parts.len() != 2 {
+            return Err(
+                Box::new(
+                    PersonFromError("not enough values in input string".to_owned())
+                )
+            );
+        }
+
+        let name: String = parts[0].to_owned();
+        let age = parts[1].parse::<usize>();
+        if name.len() == 0 || age.is_err() {
+            return Err(
+                Box::new(
+                    PersonFromError("Not enough data to parse name and/or age from input string".to_owned())
+                )
+            );
+        }
+        Ok(Person{name, age: age.unwrap()})
     }
 }
 
